@@ -1,6 +1,6 @@
 {
   "$schema": "https://deno.land/x/deno/cli/schemas/config-file.v1.json",
-  "name": "@scope/examples-websocket",
+  "name": "@scope/examples-recorder",
   "exports": "./src/main.ts",
   "tasks": {
     "dev": "deno run -A --node-modules-dir=auto npm:vite",

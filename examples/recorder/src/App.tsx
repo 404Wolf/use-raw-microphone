@@ -1,4 +1,5 @@
 import { useMicrophone } from "../../../src/hooks/useMicrophone.ts";
+// @deno-types="npm:@types/react"
 import { useCallback, useState } from "react";
 
 function App() {

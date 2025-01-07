@@ -5,12 +5,17 @@ const BUFFER_SIZE = 2048;
 const POLL_INTERVAL = 100;
 
 export function useMicrophone(onData: (data: Uint8Array) => void) {
-  const audioContext = useRef<AudioContext>();
-  const mediaStream = useRef<MediaStream>();
+  const audioContext = useRef<AudioContext>(null);
+  const mediaStream = useRef<MediaStream>(null);
 
   useEffect(() => {
     navigator.mediaDevices.getUserMedia({
-      audio: true,
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        channelCount: 1,
+        sampleRate: 16000,
+      },
       video: false,
     }).then((stream: MediaStream) => {
       mediaStream.current = stream;
@@ -19,6 +24,8 @@ export function useMicrophone(onData: (data: Uint8Array) => void) {
   }, []);
 
   const startRecording = useCallback(() => {
+    console.log("Starting recording");
+
     if (!audioContext.current || !mediaStream.current) {
       console.error("Audio context or media stream not available");
       return;
@@ -33,9 +40,11 @@ export function useMicrophone(onData: (data: Uint8Array) => void) {
       analyser.getByteFrequencyData(buffer);
       const bytesRead = buffer.reduce((acc, val) => acc + Number(val != 0), 0);
       onData(buffer.slice(0, bytesRead));
+      console.log("Posted new data");
     }, POLL_INTERVAL);
 
     return () => {
+      console.log("Cleaning up raw microphone recorder");
       analyser.disconnect();
       clearInterval(interval);
     };
