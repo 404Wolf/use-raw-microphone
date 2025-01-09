@@ -7,6 +7,7 @@ const POLL_INTERVAL = 100;
 export function useMicrophone(onData: (data: Uint8Array) => void) {
   const audioContext = useRef<AudioContext>(null);
   const mediaStream = useRef<MediaStream>(null);
+  const recInterval = useRef<number | null>(null);
 
   useEffect(() => {
     navigator.mediaDevices.getUserMedia({
@@ -35,28 +36,34 @@ export function useMicrophone(onData: (data: Uint8Array) => void) {
     analyser.fftSize = BUFFER_SIZE;
     audioContext.current.createMediaStreamSource(mediaStream.current).connect(analyser);
 
-    const interval = setInterval(() => {
+    recInterval.current = setInterval(() => {
       const buffer = new Uint8Array(BUFFER_SIZE);
       analyser.getByteFrequencyData(buffer);
-      const bytesRead = buffer.reduce((acc, val) => acc + Number(val != 0), 0);
-      onData(buffer.slice(0, bytesRead));
-      console.log("Posted new data");
+      console.log("New audio data", buffer);
+      onData(new Uint8Array(BUFFER_SIZE));
     }, POLL_INTERVAL);
 
     return () => {
       console.log("Cleaning up raw microphone recorder");
       analyser.disconnect();
-      clearInterval(interval);
+      if (recInterval.current) {
+        clearInterval(recInterval.current);
+      }
     };
   }, []);
 
-  const stopRecording = useCallback(() => {
+  const stopRecording = () => {
+    console.log("Stopping recording");
+
     if (mediaStream.current) {
       mediaStream.current.getTracks().forEach((track: MediaStreamTrack) => {
         track.stop();
       });
+      if (recInterval.current) {
+        clearInterval(recInterval.current);
+      }
     }
-  }, []);
+  };
 
   return {
     startRecording,

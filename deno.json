@@ -5,7 +5,7 @@
     "react": "npm:react@^18.3.1",
     "react-dom": "npm:react-dom@^18.3.1",
     "react-router-dom": "npm:react-router-dom@^6.28.0",
-    "@raw-audiohooks/": "./src"
+    "@raw-audiohooks/": "./src/"
   },
   "compilerOptions": {
     "types": ["react", "react-dom", "@types/react"],
