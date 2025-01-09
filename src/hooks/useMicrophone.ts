@@ -3,12 +3,20 @@ import { useCallback, useEffect, useRef } from "react";
 
 const BUFFER_SIZE = 2048;
 const POLL_INTERVAL = 100;
+
 interface UseMicrophoneHook {
   startRecording: () => (() => void) | undefined;
   stopRecording: () => void;
 }
 
-export function useMicrophone(onData: (data: Uint8Array) => void): UseMicrophoneHook {
+interface UseMicrophoneProps {
+  onData: (data: Uint8Array) => void;
+  quiet?: true;
+}
+
+export function useMicrophone({ onData, quiet }: UseMicrophoneProps): UseMicrophoneHook {
+  const log = quiet ? () => {} : console.log;
+
   const audioContext = useRef<AudioContext>(null);
   const mediaStream = useRef<MediaStream>(null);
   const recInterval = useRef<number | null>(null);
@@ -29,7 +37,7 @@ export function useMicrophone(onData: (data: Uint8Array) => void): UseMicrophone
   }, []);
 
   const startRecording = useCallback(() => {
-    console.log("Starting recording");
+    log("Starting recording");
 
     if (!audioContext.current || !mediaStream.current) {
       console.error("Audio context or media stream not available");
@@ -43,12 +51,12 @@ export function useMicrophone(onData: (data: Uint8Array) => void): UseMicrophone
     recInterval.current = setInterval(() => {
       const buffer = new Uint8Array(BUFFER_SIZE);
       analyser.getByteFrequencyData(buffer);
-      console.log("New audio data", buffer);
+      log("New audio data", buffer);
       onData(new Uint8Array(BUFFER_SIZE));
     }, POLL_INTERVAL);
 
     return () => {
-      console.log("Cleaning up raw microphone recorder");
+      log("Cleaning up raw microphone recorder");
       analyser.disconnect();
       if (recInterval.current) {
         clearInterval(recInterval.current);
@@ -57,7 +65,7 @@ export function useMicrophone(onData: (data: Uint8Array) => void): UseMicrophone
   }, []);
 
   const stopRecording = () => {
-    console.log("Stopping recording");
+    log("Stopping recording");
 
     if (mediaStream.current) {
       mediaStream.current.getTracks().forEach((track: MediaStreamTrack) => {
