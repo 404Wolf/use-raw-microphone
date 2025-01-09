@@ -1,1 +1,1 @@
-export { useMicrophone } from "@raw-audiohooks/hooks/useMicrophone.ts";
+export { useMicrophone } from "./src/hooks/useMicrophone.ts";
