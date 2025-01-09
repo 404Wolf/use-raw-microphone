@@ -1,10 +1,14 @@
-// @deno-types="npm:@types/react"
+// @deno-types="npm:@types/react@19.0.2"
 import { useCallback, useEffect, useRef } from "react";
 
 const BUFFER_SIZE = 2048;
 const POLL_INTERVAL = 100;
+interface UseMicrophoneHook {
+  startRecording: () => (() => void) | undefined;
+  stopRecording: () => void;
+}
 
-export function useMicrophone(onData: (data: Uint8Array) => void) {
+export function useMicrophone(onData: (data: Uint8Array) => void): UseMicrophoneHook {
   const audioContext = useRef<AudioContext>(null);
   const mediaStream = useRef<MediaStream>(null);
   const recInterval = useRef<number | null>(null);

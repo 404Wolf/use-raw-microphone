@@ -15,5 +15,9 @@
   },
   "fmt": {
     "lineWidth": 100
-  }
+  },
+  "exports": "./mod.ts",
+  "license": "MIT",
+  "name": "@raw-audiohooks/raw-audiohooks",
+  "version": "0.0.1"
 }
